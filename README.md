@@ -1,11 +1,10 @@
 # Minesweeper
 Minesweeper game for AP CompSci
 
-public class Square {
-	
-   boolean isBomb; 
-   int bombNum; //number of bombs touching tile
-   int num;//number of that individual square
+public class Square{
+	boolean isBomb;
+	int bombNum; //number of bombs touching tile
+	int num; //number of that individual square
 	
 	public Square(boolean a, int b, int c){
 		isBomb = a;
@@ -14,19 +13,19 @@ public class Square {
 	}
 	
 	@Override //overrides .equals()
-	public boolean equals(Object obj) {
-		
+	public boolean equals(Object obj){
+	
 	}
 	
-	@Override
-	public int hashCode() {
-	    
+	@Override //overrides hashCode
+	public int hashCode(){
+	
 	}
 	
-	public void setBombNum(){ //sets squares that aren't bombs
+	public void setBombNum(){ //sets square that aren't bombs
 		for(int x = 0; x < 9; x++){
-			for(int y = 0; y< 0;y++){
-				if(Board.grid[x-1][y-1].equals((true,0,0))){
+			for(int y = 0; y < 9; y++){
+				if(Board.grid[x-1][y-1].equals((true, 0, 0))){
 					bombNum++;
 				}
 			}
