@@ -1,4 +1,4 @@
-public class Square{
+ public class Square{
 	boolean isBomb;
 	int bombNum; //number of bombs touching tile
 	int num; //number of that individual square
@@ -9,44 +9,45 @@ public class Square{
 		num = c;
 	}
 	
-	public boolean bombCheck(Object obj){ //accessor to see if square is a bomb
+	public boolean bombCheck(){ //accessor to see if square is a bomb
 		return isBomb;
 		//what's the difference between doing object.bombCheck() vs bombCheck(object)??????
 	}
 	
-	public void setBombNum(){ //bombNum modifier
-		for(int x = 0; x < 9; x++){
-			for(int y = 0; y < 9; y++){
-				if(bombCheck(Board.sqrGrid[x-1][y-1]) == true){ //top left corner
-					bombNum++;
-				}
-				if(bombCheck(Board.sqrGrid[x][y-1]) == true){ //on top
-					bombNum++;
-				}
-				if(bombCheck(Board.sqrGrid[x+1][y-1]) == true){ //top right corner
-					bombNum++;
-				}
-				if(bombCheck(Board.sqrGrid[x-1][y]) == true){ //left
-					bombNum++;
-				}
-				if(bombCheck(Board.sqrGrid[x+1][y]) == true){ //right
-					bombNum++;
-				}
-				if(bombCheck(Board.sqrGrid[x-1][y+1]) == true){ //bottom left corner
-					bombNum++;
-				}
-				if(bombCheck(Board.sqrGrid[x][y+1]) == true){ //on bottom
-					bombNum++;
-				}
-				if(bombCheck(Board.sqrGrid[x+1][y+1]) == true){ //bottom right corner
-					bombNum++;
-				}
-			}
+	public boolean makeBomb(){ //modifier that makes isBomb true
+		return isBomb = true;
+	}
+	
+	public void setBombNum(int x, int y){ //bombNum modifier //does weird thing that counts the squares that aren't bombs i think
+		
+		if((x != 0 && y != 0) && Board.sqrGrid[x-1][y-1].bombCheck() == true && Board.sqrGrid[x][y].bombCheck() == false){ //top left corner
+			Board.sqrGrid[x][y].bombNum++;
+		}
+		if((y != 0) && Board.sqrGrid[x][y-1].bombCheck() == true && Board.sqrGrid[x][y].bombCheck() == false){ //on top
+			Board.sqrGrid[x][y].bombNum++;
+		}
+		if((x != 8 && y != 0) && Board.sqrGrid[x+1][y-1].bombCheck() == true && Board.sqrGrid[x][y].bombCheck() == false){ //top right corner
+			Board.sqrGrid[x][y].bombNum++;
+		}
+		if((x != 0) && Board.sqrGrid[x-1][y].bombCheck() == true && Board.sqrGrid[x][y].bombCheck() == false){ //left
+			Board.sqrGrid[x][y].bombNum++;
+		}
+		if((x != 8) && Board.sqrGrid[x+1][y].bombCheck() == true && Board.sqrGrid[x][y].bombCheck() == false){ //right
+			Board.sqrGrid[x][y].bombNum++;
+		}
+		if((x != 0 && y != 8) && Board.sqrGrid[x-1][y+1].bombCheck() == true && Board.sqrGrid[x][y].bombCheck() == false){ //bottom left corner
+			Board.sqrGrid[x][y].bombNum++;
+		}
+		if((y != 8) && Board.sqrGrid[x][y+1].bombCheck() == true && Board.sqrGrid[x][y].bombCheck() == false){ //on bottom
+			Board.sqrGrid[x][y].bombNum++;
+		}
+		if((x != 8 && y != 8) && Board.sqrGrid[x+1][y+1].bombCheck() == true && Board.sqrGrid[x][y].bombCheck() == false){ //bottom right corner
+			Board.sqrGrid[x][y].bombNum++;
 		}
 	}
 	
-	public boolean makeBomb(){ //modifier that makes isBomb true
-		return isBomb = true;
+	public int getBombNum(){
+		return bombNum;
 	}
 	
 	@Override //to look at actually values of the squares/debug
