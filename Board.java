@@ -22,20 +22,32 @@ public class Board {
 		{new Square(false, 0, 73), new Square(false, 0, 74), new Square(false, 0, 75), new Square(false, 0, 76), new Square(false, 0, 77), new Square(false, 0, 78), new Square(false, 0, 79), new Square(false, 0, 80), new Square(false, 0, 81),},
 	};
 	
-	public static char[][] grid = { //char grid that represents the 2D array of squares
-			{' ', ' ', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ',},
-			{' ', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=',},
-			{'1', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|',},
-			{'2', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|',},
-			{'3', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|',},
-			{'4', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|',},
-			{'5', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|',},
-			{'6', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|',},
-			{'7', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|',},
-			{'8', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|',},
-			{'9', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|',},
-			{' ', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=',},
+	public static String[][] grid = { //char grid that represents the 2D array of squares
+			{" ", " ", "1", '2', '3', '4', '5', '6', '7', '8', '9', ' ',},
+			{" ", "=", "=", "=", "=", "=", "=", "=", "=", "=", "=", "=",},
+			{"1", "|", ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', "|",},
+			{"2", "|", ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', "|",},
+			{"3", "|", ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', "|",},
+			{"4", "|", ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', "|",},
+			{"5", "|", ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', "|",},
+			{"6", "|", ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', "|",},
+			{"7", "|", ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', "|",},
+			{"8", "|", ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', "|",},
+			{"9", "|", ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', "|",},
+			{" ", "=", "=", "=", "=", "=", "=", "=", "=", "=", "=", "=",},
 	};
+	
+	public static int[][] checked = {  //used to distinguish which squares have been checked in pathfind. 1 = has been checked, 0 = hasn't
+		{0, 0, 0, 0, 0, 0, 0, 0, 0,},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0,},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0,},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0,},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0,},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0,},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0,},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0,},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0,},
+};
 	
 	public static void fillBoard()//puts down bombs
 	{
@@ -46,4 +58,60 @@ public class Board {
 			sqrGrid[x][y].makeBomb();
 		}
 	}
+	
+	public void test(){//testing to make sure pathfinding works. This is so I can look at the Squares not near bombs
+		for(int x = 0; x < 9; x++){
+			for(int y = 0; y < 9; y++){
+				if(sqrGrid[x][y].bombCheck() == true){
+					grid[x+2][y+2] = 'X';
+				}
+			}
+		}
+		for(int x = 2; x < 11; x++){
+			for(int y = 2; y < 11; y++){
+				if(sqrGrid[x-2][y-2].bombCheck() == false){
+					grid[x][y] = sqrGrid[x-2][y-2].getBombNum();
+				}
+				
+			}
+		}
+		for(int rows = 0; rows < Board.grid.length; rows++){
+			System.out.println(" ");
+			for(int columns = 0; columns < Board.grid[0].length; columns++){
+				System.out.print(Board.grid[rows][columns] +" ");
+			}
+		}
+	}
+	
+	public static char[][] pathfind(int x, int y){ //to find Squares next to bombs
+		checked[x][y+1] = 1;
+		if(sqrGrid[x][y+1].bombCheck() == true) {
+			checked[x+1][y+1] = 1;
+			if(sqrGrid[x+1][y+1].bombCheck() == true){
+				checked[x+1][y] = 1;
+				if(sqrGrid[x+1][y].bombCheck() == true){
+					checked[x+1][y-1] = 1;
+					if(sqrGrid[x+1][y-1].bombCheck() == true){
+						checked[x][y-1] = 1;
+						if(sqrGrid[x][y-1].bombCheck() == true){
+							checked[x-1][y-1] = 1;
+							if(sqrGrid[x-1][y-1].bombCheck() == true){
+								checked[x-1][y] = 1;
+								if(sqrGrid[x-1][y].bombCheck() == true){
+									checked[x-1][y+1] = 1;
+									if(sqrGrid[x-1][y+1].bombCheck() == true){
+										
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		else{
+			
+		}
+	}
 }
+
