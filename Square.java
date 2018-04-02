@@ -1,4 +1,4 @@
- public class Square{
+public class Square{
 	boolean isBomb;
 	int bombNum; //number of bombs touching tile
 	int num; //number of that individual square
@@ -50,8 +50,10 @@
 		return bombNum;
 	}
 	
-	@Override //to look at actually values of the squares/debug
+	@Override //to look at actual values of the squares/debug
 	public String toString(){
 		return "(isBomb = " + isBomb + "; bombNum = " + bombNum + "; num = " + num +")";
 	}
 }
+
+
