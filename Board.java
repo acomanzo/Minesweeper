@@ -6,10 +6,10 @@ import java.util.Random;
 public class Board {
 	static int r = 0;
 	static Random rand = new Random();
-	static int x;
-	static int y;
-	//public ArrayList<Square> grid = new ArrayList<Square>();
-	//public static Square[][] grid = new Square[9][9];//perhaps i need to specify each square for constructor to work
+	static int row;
+	static int col;
+	public static int numberOfBombs = 0;
+
 	public static Square[][] sqrGrid = { //sqrGrid = square grid
 		{new Square(false, 0, 1), new Square(false, 0, 2), new Square(false, 0, 3), new Square(false, 0, 4), new Square(false, 0, 5), new Square(false, 0, 6), new Square(false, 0, 7), new Square(false, 0, 8), new Square(false, 0, 9),},
 		{new Square(false, 0, 10), new Square(false, 0, 11), new Square(false, 0, 12), new Square(false, 0, 13), new Square(false, 0, 14), new Square(false, 0, 15), new Square(false, 0, 16), new Square(false, 0, 17), new Square(false, 0, 18),},
@@ -58,9 +58,16 @@ public class Board {
 	{
 		for(int i = 0; i < 10; i++)
 		{
-			x = rand.nextInt(9);
-			y = rand.nextInt(9);
-			sqrGrid[x][y].makeBomb();
+			row = rand.nextInt(9);
+			col = rand.nextInt(9);
+			sqrGrid[row][col].makeBomb();
+		}
+		for(int rows = 0; rows < sqrGrid.length; rows++){
+			for(int cols = 0; cols < sqrGrid[0].length; cols++){
+				if(sqrGrid[rows][cols].bombCheck() == true){
+					numberOfBombs++;
+				}
+			}
 		}
 	}
 	
@@ -88,136 +95,80 @@ public class Board {
 		}
 	}
 	
-	public static void pathfind(int x, int y){ //to find Squares next to bombs. 2 and 3 are subtracted due to differences in lengths of the two arrays
-		if(sqrGrid[x-2][y-2].bombCheck() == false && sqrGrid[x-2][y-2].getBombNum() == 0){
-			if((y < 9 && y > 3 && x < 9 && x > 2) && (checked.contains(sqrGrid[x-2][y-3]) == false)){//square right above input
-				checked.add(sqrGrid[x-2][y-3]);
-				grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-				pathfind(x, y-1);
+	
+	public static void pathfind(int row, int col){ //to find Squares next to bombs. row-1 and col-1 are to make up the offset (same for row+1 and col+1)
+		
+		//to fix the problem of there being holes in the recursion, I had to get rid of .bombCheck() == false in the bottom else because the square that is going to be checked is 
+		//put into checked before the recursion is done on it, so if it's the last square and all the squares around it are checked, and it itself is in checked,
+		//it won't meet any of the conditions, and therefore won't appear on the grid
+		
+		if(sqrGrid[row-1][col-1].bombCheck() == false && sqrGrid[row-1][col-1].getBombNum() == 0){
+			if((col < 10 && col > 1 && row < 10 && row > 0) && (checked.contains(sqrGrid[row-1][col-2]) == false) && !(grid[row+1][col+1].equals("F"))){//square directly left
+				checked.add(sqrGrid[row-1][col-2]);
+				grid[row+1][col+1] = Integer.toString(sqrGrid[row-1][col-1].getBombNum());
+				pathfind(row, col-1);//must be relative to the parameter intake
 			}
-			else if((y < 9 && y > 3 && x < 9 && x > 1) && (checked.contains(sqrGrid[x-1][y-3]) == false)){//diagonally up right
-				checked.add(sqrGrid[x-1][y-3]);
-				
-				grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-				pathfind(x+1, y-1);
+			if((col < 10 && col > 1 && row < 9 && row > 0) && (checked.contains(sqrGrid[row][col-2]) == false) && !(grid[row+1][col+1].equals("F"))){//diagonally down left
+				checked.add(sqrGrid[row][col-2]);
+				grid[row+1][col+1] = Integer.toString(sqrGrid[row-1][col-1].getBombNum());
+				pathfind(row+1, col-1);
 			}
-			else if((y < 9 && y > 2 && x < 9 && x > 1) && (checked.contains(sqrGrid[x-1][y-2]) == false)){//directly right
-				checked.add(sqrGrid[x-1][y-2]);
-				
-				grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-				pathfind(x+1, y);
+			if((col < 10 && col > 0 && row < 9 && row > 0) && (checked.contains(sqrGrid[row][col-1]) == false) && !(grid[row+1][col+1].equals("F"))){//directly down
+				checked.add(sqrGrid[row][col-1]);
+				grid[row+1][col+1] = Integer.toString(sqrGrid[row-1][col-1].getBombNum());
+				pathfind(row+1, col);
 			}
-			else if((y < 9 && y > 1 && x < 9 && x > 1) && (checked.contains(sqrGrid[x-1][y-1]) == false)){//diagonally down right
-				checked.add(sqrGrid[x-1][y-1]);
+			if((col < 9 && col > 0 && row < 9 && row > 0) && (checked.contains(sqrGrid[row][col]) == false) && !(grid[row+1][col+1].equals("F"))){//diagonally down right
+				checked.add(sqrGrid[row][col]);
+				grid[row+1][col+1] = Integer.toString(sqrGrid[row-1][col-1].getBombNum());
+				pathfind(row+1, col+1);
 				
-				grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-				pathfind(x+1, y+1);
 			}
-			else if((y < 9 && y > 1 && x < 9 && x > 2) && (checked.contains(sqrGrid[x-2][y-1]) == false)){//directly down
-				checked.add(sqrGrid[x-2][y-1]);
-				
-				grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-				pathfind(x, y+1);
+			if((col < 9 && col > 0 && row < 10 && row > 0) && (checked.contains(sqrGrid[row-1][col]) == false) && !(grid[row+1][col+1].equals("F"))){//directly right
+				checked.add(sqrGrid[row-1][col]);
+				grid[row+1][col+1] = Integer.toString(sqrGrid[row-1][col-1].getBombNum());
+				pathfind(row, col+1);
+					
 			}
-			else if((y < 9 && y > 1 && x < 9 && x > 3) && (checked.contains(sqrGrid[x-3][y-1]) == false)){//diagonally down left
-				checked.add(sqrGrid[x-3][y-1]);
+			if((col < 9 && col > 0 && row < 10 && row > 1) && (checked.contains(sqrGrid[row-2][col]) == false) && !(grid[row+1][col+1].equals("F"))){//diagonally up right
+				checked.add(sqrGrid[row-2][col]);
+				grid[row+1][col+1] = Integer.toString(sqrGrid[row-1][col-1].getBombNum());
+				pathfind(row-1, col+1);
 				
-				grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-				pathfind(x-1, y+1);
 			}
-			else if((y < 9 && y > 2 && x < 9 && x > 3) && (checked.contains(sqrGrid[x-3][y-2]) == false)){//directly left
-				checked.add(sqrGrid[x-3][y-2]);
+			if((col < 10 && col > 0 && row < 10 && row > 1) && (checked.contains(sqrGrid[row-2][col-1]) == false) && !(grid[row+1][col+1].equals("F"))){//directly up
+				checked.add(sqrGrid[row-2][col-1]);
+				grid[row+1][col+1] = Integer.toString(sqrGrid[row-1][col-1].getBombNum());
+				pathfind(row-1, col);
 				
-				grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-				pathfind(x-1, y);
 			}
-			else if((y < 9 && y > 3 && x < 9 && x > 3) && (checked.contains(sqrGrid[x-3][y-3]) == false)){//diagonally up left
-				checked.add(sqrGrid[x-3][y-3]);
-				
-				grid[x][y] = Integer.toString(sqrGrid[x-1][y-1].getBombNum());
-				pathfind(x-1, y-1);
+			if((col < 10 && col > 1 && row < 10 && row > 1) && (checked.contains(sqrGrid[row-2][col-2]) == false) && !(grid[row+1][col+1].equals("F"))){//diagonally up left
+				checked.add(sqrGrid[row-2][col-2]);
+				grid[row+1][col+1] = Integer.toString(sqrGrid[row-1][col-1].getBombNum());
+				pathfind(row-1, col-1);
+					
 			}
 			else{
-				if(checked.contains(sqrGrid[x-2][y-2]) == false && (y < 9 && y > 1 && x < 9 && x > 1)){
-					checked.add(sqrGrid[x-2][y-2]);
-					grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
+				if((col < 10 && col > 0 && row < 10 && row > 0) && !(grid[row+1][col+1].equals("F"))){
+					checked.add(sqrGrid[row-1][col-1]);
+					grid[row+1][col+1] = Integer.toString(sqrGrid[row-1][col-1].getBombNum());
 					}
 				}
 			}
-		else if(sqrGrid[x-2][y-2].bombCheck() == false && sqrGrid[x-2][y-2].getBombNum() > 0){
-			grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
+		else if(sqrGrid[row-1][col-1].bombCheck() == false && sqrGrid[row-1][col-1].getBombNum() > 0 && !(grid[row+1][col+1].equals("F"))){
+			grid[row+1][col+1] = Integer.toString(sqrGrid[row-1][col-1].getBombNum());
 		}
-		else{
-			
-		}
-		/*if((y < 9 && y > 3 && x < 9 && x > 2) && (checked.contains(sqrGrid[x-2][y-3]) == false) && (sqrGrid[x-2][y-2].isBomb == false)){//square right above input
-			checked.add(sqrGrid[x-2][y-3]);
-			grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-			pathfind(x, y-1);
-		}
-		else if((y < 9 && y > 3 && x < 9 && x > 1) && (checked.contains(sqrGrid[x-1][y-3]) == false) && (sqrGrid[x-2][y-2].isBomb == false)){//diagonally up right
-			checked.add(sqrGrid[x-1][y-3]);
-			
-			grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-			pathfind(x+1, y-1);
-		}
-		else if((y < 9 && y > 2 && x < 9 && x > 1) && (checked.contains(sqrGrid[x-1][y-2]) == false) && (sqrGrid[x-2][y-2].isBomb == false)){//directly right
-			checked.add(sqrGrid[x-1][y-2]);
-			
-			grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-			pathfind(x+1, y);
-		}
-		else if((y < 9 && y > 1 && x < 9 && x > 1) && (checked.contains(sqrGrid[x-1][y-1]) == false) && (sqrGrid[x-2][y-2].isBomb == false)){//diagonally down right
-			checked.add(sqrGrid[x-1][y-1]);
-			
-			grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-			pathfind(x+1, y+1);
-		}
-		else if((y < 9 && y > 1 && x < 9 && x > 2) && (checked.contains(sqrGrid[x-2][y-1]) == false) && (sqrGrid[x-2][y-2].isBomb == false)){//directly down
-			checked.add(sqrGrid[x-2][y-1]);
-			
-			grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-			pathfind(x, y+1);
-		}
-		else if((y < 9 && y > 1 && x < 9 && x > 3) && (checked.contains(sqrGrid[x-3][y-1]) == false) && (sqrGrid[x-2][y-2].isBomb == false)){//diagonally down left
-			checked.add(sqrGrid[x-3][y-1]);
-			
-			grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-			pathfind(x-1, y+1);
-		}
-		else if((y < 9 && y > 2 && x < 9 && x > 3) && (checked.contains(sqrGrid[x-3][y-2]) == false) && (sqrGrid[x-2][y-2].isBomb == false)){//directly left
-			checked.add(sqrGrid[x-3][y-2]);
-			
-			grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-			pathfind(x-1, y);
-		}
-		else if((y < 9 && y > 3 && x < 9 && x > 3) && (checked.contains(sqrGrid[x-3][y-3]) == false) && (sqrGrid[x-2][y-2].isBomb == false)){//diagonally up left
-			checked.add(sqrGrid[x-3][y-3]);
-			
-			grid[x][y] = Integer.toString(sqrGrid[x-1][y-1].getBombNum());
-			pathfind(x-1, y-1);
-		}
-		else{
-			if(checked.contains(sqrGrid[x-2][y-2]) == false && (y < 9 && y > 1 && x < 9 && x > 1)){
-				if(sqrGrid[x-2][y-2].isBomb == false){
-					checked.add(sqrGrid[x-2][y-2]);
-					//for(int xx = 0; xx < sqrGrid.length; xx++){
-					//	for(int yy = 0; yy < sqrGrid[0].length; yy++){
-					//		if(checked.contains(sqrGrid[x][y]) && sqrGrid[x][y].isBomb == false && sqrGrid[x][y].bombNum == 0){
-					//			grid[x+2][y+2] = Integer.toString(sqrGrid[x][y].getBombNum());
-					//		}
-					//	}
-					grid[x][y] = Integer.toString(sqrGrid[x-2][y-2].getBombNum());
-				}
-			}
-		}*/
+	}
+
+	
+	void printChecked(){
 		for(int i = 0; i < checked.size(); i++){//temporary
 			System.out.println(checked.get(i));
 		}
 	}
 	
-	boolean checkClick(int x, int y){//checks to see if a click input was a bomb
-		if((x < 9) && (y < 9) && sqrGrid[x-2][y-2].isBomb == true){
+	boolean checkClick(int row, int col){//checks to see if a click input was a bomb
+		if((col < 10 && col > 0 && row < 10 && row > 0) && sqrGrid[row-1][col-1].isBomb == true){
 			return true; // means you've lost
 		}
 		else{
