@@ -26,7 +26,7 @@ public class minesweeperMain {
 		
 		
 		Board flat = new Board();
-		flat.test(); //shows the board with all the bombs and numbers
+		//flat.test(); //shows the board with all the bombs and numbers
 		System.out.print("\n");
 		
 		Scanner kbReader = new Scanner(System.in);
