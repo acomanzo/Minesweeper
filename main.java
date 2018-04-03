@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.regex.*;
 
 public class minesweeperMain {
 	public static void main(String[] args){
@@ -46,15 +47,17 @@ public class minesweeperMain {
 			while(true){
 				System.out.println("\nAwaiting an x-coordinate.");
 				input = kbReader.next();
-				if(input.matches("[a-zA-Z]")){
-					System.out.println("Enter a number.");
+				if(input.matches("[^1-9]+|[a-zA-Z0-9]{2,}|-[a-zA-Z0-9]{2,}") || input.length() > 10 || input.contains("\\")){
+					System.out.println("Enter a number 1-9.");
 				}
 				else{
 					if(Integer.parseInt(input) > 9 || Integer.parseInt(input) < 1){
 						System.out.println("Enter a number 1-9.");
 					}
 					else{
+						input = input.trim();
 						col = Integer.parseInt(input);
+						//System.out.println(col);
 						end1 = true;
 					}
 				}
@@ -66,7 +69,7 @@ public class minesweeperMain {
 				
 				System.out.println("Awaiting a y-coordinate.");
 				input = kbReader.next();
-				if(input.matches("[a-zA-Z]")){
+				if(input.matches("[^1-9]+|[a-zA-Z0-9]{2,}|-[a-zA-Z0-9]{2,}") || input.length() > 10 || input.contains("\\")){
 					System.out.println("Enter a number.");
 				}
 				else{
@@ -74,6 +77,7 @@ public class minesweeperMain {
 						System.out.println("Enter a number 1-9.");
 					}
 					else{
+						input = input.trim();
 						row = Integer.parseInt(input);
 						end2 = true;
 					}
@@ -150,7 +154,4 @@ public class minesweeperMain {
 			System.out.println("You win!");
 		}
 	}
-	}
-
-
-
+}
