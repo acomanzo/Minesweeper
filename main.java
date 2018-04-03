@@ -1,5 +1,4 @@
 import java.util.Scanner;
-import java.util.regex.*;
 
 public class minesweeperMain {
 	public static void main(String[] args){
